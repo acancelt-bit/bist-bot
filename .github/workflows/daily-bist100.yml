@@ -25,7 +25,20 @@ jobs:
 
       - run: pip install -r requirements-bist.txt
 
-      - env:
+      - name: Raporu calistir
+        env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         run: python bist100_daily.py
+
+      # Yukaridaki adim patlarsa gruba uyari dus: sessizlik = "veri yok",
+      # bu mesaj = "bot bugun calisamadi".
+      - name: Hata bildirimi
+        if: failure()
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TG_CHAT_ID}" \
+            --data-urlencode "text=⚠️ BİST günlük raporu bugün üretilemedi (workflow hatası). GitHub Actions loglarına bakın."
