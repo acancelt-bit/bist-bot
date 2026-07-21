@@ -1,9 +1,9 @@
 name: Crypto Daily Report
 
-# Kripto 7/24. Gunluk ozet: 06:00 UTC = 09:00 TR, her gun.
+# Kripto 7/24. Ozet 6 saatte bir: 00/06/12/18 UTC = 03/09/15/21 TR.
 "on":
   schedule:
-    - cron: '0 6 * * *'
+    - cron: '0 0,6,12,18 * * *'
   workflow_dispatch:
 
 jobs:
@@ -32,4 +32,4 @@ jobs:
           CHAT="${TG_CHAT_ID_CRYPTO:-$TG_CHAT_ID}"
           curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
             --data-urlencode "chat_id=${CHAT}" \
-            --data-urlencode "text=⚠️ Kripto günlük özeti üretilemedi (workflow hatası). Actions loglarına bakın."
+            --data-urlencode "text=⚠️ Kripto özeti üretilemedi (workflow hatası). Actions loglarına bakın."

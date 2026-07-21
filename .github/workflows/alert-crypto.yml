@@ -1,9 +1,9 @@
 name: Crypto Alert Scan
 
-# Kripto 7/24: saat basi, her gun.
+# Kripto 7/24: saat basi ama :00 kalabalik oldugundan :17'de (daha guvenilir).
 "on":
   schedule:
-    - cron: '0 * * * *'
+    - cron: '17 * * * *'
   workflow_dispatch:
 
 permissions:
