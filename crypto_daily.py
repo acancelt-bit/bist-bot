@@ -21,7 +21,7 @@ CHUNK_SIZE = 20
 
 
 def format_chunk(rows, part, total, mood) -> str:
-    lines = [f"🪙 Kripto Günlük Sıralama ({part}/{total})"]
+    lines = [f"🪙 Kripto Sıralama ({part}/{total})"]
     if part == 1:
         lines.append(mood)
     lines.append("")
