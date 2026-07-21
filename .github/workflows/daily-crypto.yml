@@ -1,0 +1,35 @@
+name: Crypto Daily Report
+
+# Kripto 7/24. Gunluk ozet: 06:00 UTC = 09:00 TR, her gun.
+"on":
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements-crypto.txt
+      - name: Ozeti calistir
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          TG_CHAT_ID_CRYPTO: ${{ secrets.TG_CHAT_ID_CRYPTO }}
+          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+        run: python crypto_daily.py
+      - name: Hata bildirimi
+        if: failure()
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          TG_CHAT_ID_CRYPTO: ${{ secrets.TG_CHAT_ID_CRYPTO }}
+        run: |
+          CHAT="${TG_CHAT_ID_CRYPTO:-$TG_CHAT_ID}"
+          curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${CHAT}" \
+            --data-urlencode "text=⚠️ Kripto günlük özeti üretilemedi (workflow hatası). Actions loglarına bakın."

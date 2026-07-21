@@ -1,0 +1,53 @@
+name: Crypto Alert Scan
+
+# Kripto 7/24: saat basi, her gun.
+"on":
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements-crypto.txt
+
+      - name: Taramayi calistir
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          TG_CHAT_ID_CRYPTO: ${{ secrets.TG_CHAT_ID_CRYPTO }}
+          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+        run: python crypto_alert.py
+
+      - name: Durum dosyasini kaydet
+        continue-on-error: true
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add crypto_alerted_state.json
+          if git diff --staged --quiet; then
+            echo "Degisiklik yok."
+          else
+            git commit -m "chore: kripto dedup durumu guncellendi"
+            git push
+          fi
+
+      - name: Hata bildirimi
+        if: failure()
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          TG_CHAT_ID_CRYPTO: ${{ secrets.TG_CHAT_ID_CRYPTO }}
+        run: |
+          CHAT="${TG_CHAT_ID_CRYPTO:-$TG_CHAT_ID}"
+          curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${CHAT}" \
+            --data-urlencode "text=⚠️ Kripto saatlik taraması bu saat çalışamadı (workflow hatası). Actions loglarına bakın."
