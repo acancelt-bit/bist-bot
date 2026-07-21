@@ -2,7 +2,7 @@ name: BIST100 Daily Report
 
 # BİST seansı 10:00-18:00 (TR, UTC+3). Rapor açılıştan önce hazır olsun
 # diye 09:30 TR = 06:30 UTC, hafta içi.
-on:
+"on":
   schedule:
     - cron: '30 6 * * 1-5'
   workflow_dispatch:
