@@ -2,7 +2,7 @@ name: BIST100 Daily Report
 
 # BİST seansı 10:00-18:00 (TR, UTC+3). Rapor açılıştan önce hazır olsun
 # diye 09:30 TR = 06:30 UTC, hafta içi.
-on:
+"on":
   schedule:
     - cron: '30 6 * * 1-5'
   workflow_dispatch:
@@ -15,7 +15,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
 
       # Türkçe BERT modelini her koşuda yeniden indirmemek için cache.
       - name: HuggingFace model cache
