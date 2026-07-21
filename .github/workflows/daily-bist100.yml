@@ -1,1 +1,31 @@
+name: BIST100 Daily Report
 
+# BİST seansı 10:00-18:00 (TR, UTC+3). Rapor açılıştan önce hazır olsun
+# diye 09:30 TR = 06:30 UTC, hafta içi.
+on:
+  schedule:
+    - cron: '30 6 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  run-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Türkçe BERT modelini her koşuda yeniden indirmemek için cache.
+      - name: HuggingFace model cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-savasy-turkish-sentiment
+
+      - run: pip install -r requirements-bist.txt
+
+      - env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: python bist100_daily.py
